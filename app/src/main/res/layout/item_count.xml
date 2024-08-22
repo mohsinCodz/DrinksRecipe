@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"> <!-- Padding around the CardView -->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:padding="10dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="3dp">
+    <!-- Padding inside the CardView -->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp"> <!-- Padding inside the LinearLayout -->
+
+        <!-- Image of the drink -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ivDrinkThumb"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher_background"
+            app:civ_border_color="#FF000000"/>
+
+        <!-- Text information about the drink -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="16dp">
+
+            <TextView
+                android:id="@+id/tvDrinkName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Margarita Glass"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:minLines="1"/>
+
+            <TextView
+                android:id="@+id/tvDrinkDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Place all ingredients in a blender"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:minLines="1"/>
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/cbFavorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/selector_fav_item"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical"/>
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp"
+            android:gravity="center_horizontal">
+
+            <!-- TextView for the label -->
+            <TextView
+                android:id="@+id/tvAlcoholLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alcoholic"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:layout_marginTop="-2dp"
+                android:paddingBottom="0dp"/> <!-- Remove bottom padding -->
+
+            <!-- CheckBox -->
+            <CheckBox
+                android:id="@+id/cbAlcohol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:layout_marginTop="-15dp"/> <!-- Negative margin to reduce gap -->
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+
+</LinearLayout>

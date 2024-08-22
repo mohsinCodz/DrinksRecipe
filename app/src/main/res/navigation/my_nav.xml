@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/my_nav"
+    app:startDestination="@id/drinksRecipes">
+
+    <fragment
+        android:id="@+id/drinksRecipes"
+        android:name="mohsin.code.drinksrecipe.DrinksRecipes"
+        android:label="Drinks Recipes"
+        tools:layout="@layout/fragment_drinks_recipes" />
+    <fragment
+        android:id="@+id/favoriteRecipes"
+        android:name="mohsin.code.drinksrecipe.FavoriteRecipes"
+        android:label="Favorite Recipes"
+        tools:layout="@layout/fragment_favorite_recipes" />
+</navigation>
