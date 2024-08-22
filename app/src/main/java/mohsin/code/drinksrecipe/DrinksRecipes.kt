@@ -61,8 +61,6 @@ class DrinksRecipes : Fragment() {
         rvItem.adapter = adapter
 
 
-
-
         val radioGroup: RadioGroup = view.findViewById(R.id.radioGroup)
 
         // Set up SearchView
@@ -106,7 +104,6 @@ class DrinksRecipes : Fragment() {
             drinksViewModel.drinks.postValue(drinks)
         }
 
-        // Observe drinks from the repository
         drinksViewModel.drinks.observe(viewLifecycleOwner) { drinks ->
             mList.clear()
             mList.addAll(drinks)

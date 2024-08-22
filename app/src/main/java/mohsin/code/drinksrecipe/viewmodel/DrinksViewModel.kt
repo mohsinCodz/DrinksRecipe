@@ -1,11 +1,14 @@
 package mohsin.code.drinksrecipe.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mohsin.code.drinksrecipe.model.Drink
+import mohsin.code.drinksrecipe.model.SearchQuery
 import mohsin.code.drinksrecipe.repository.DrinkRepository
 
 class DrinksViewModel(private val drinkRepository: DrinkRepository) : ViewModel() {
@@ -13,19 +16,12 @@ class DrinksViewModel(private val drinkRepository: DrinkRepository) : ViewModel(
     // LiveData for observing drinks
     val drinks: MutableLiveData<List<Drink>> = MutableLiveData()
 
-
-
     // LiveData for observing favorite drinks
     val favoriteDrinks: LiveData<List<Drink>> = drinkRepository.getFavoriteDrinks()
-
-    init {
-        drinkRepository.getDrinksAll()
-    }
 
     fun insertFav(id: Int, isSelected: Boolean) = viewModelScope.launch {
         drinkRepository.updateFavoriteStatus(id, isSelected)
     }
-
 
     // Perform search with filtering logic
     fun performSearch(query: String, searchType: String) {
