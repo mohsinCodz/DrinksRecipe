@@ -18,15 +18,19 @@ class DrinkRepository(
 ) {
 
     suspend fun searchByName(name: String): List<Drink> {
-        return apiInterface.getDrinksByName(name).drinks
+        val drinks = apiInterface.getDrinksByName(name).drinks
+        drinkDatabase.drinkDao().insertDrink(drinks) // Insert into RoomDB with idDrink as the primary key
+        return drinks
     }
 
     suspend fun searchByAlphabet(alphabet: String): List<Drink> {
-        return apiInterface.getDrinksByAlphabet(alphabet).drinks
-    }
+        val drinks = apiInterface.getDrinksByAlphabet(alphabet).drinks
+        drinkDatabase.drinkDao().insertDrink(drinks) // Insert into RoomDB with idDrink as the primary key
+        return drinks
+}
 
-    fun getDrinksAll(): LiveData<List<Drink>>{
-        return drinkDatabase.drinkDao().getDrinks()
+        fun getDrinksAll(): LiveData<List<Drink>> {
+        return drinkDatabase.drinkDao().getDrinks() // Get data from RoomDB
     }
 
     // Expose favorite drinks as LiveData
@@ -39,12 +43,4 @@ class DrinkRepository(
         drinkDatabase.drinkDao().updateFavoriteStatus(id, isFavorite)
     }
 
-    suspend fun saveLastSearch(query: String, searchType: String) {
-        val searchQuery = SearchQuery(query = query, searchType = searchType)
-        drinkDatabase.drinkDao().insertSearchQuery(searchQuery)
-    }
-
-    suspend fun getLastSearch(): SearchQuery? {
-        return drinkDatabase.drinkDao().getLastSearchQuery()
-    }
 }
