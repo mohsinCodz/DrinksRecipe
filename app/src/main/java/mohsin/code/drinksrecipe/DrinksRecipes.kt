@@ -47,10 +47,10 @@ class DrinksRecipes : Fragment() {
         // Initialize the adapter and set it to the fragment's adapter property
         adapter = ItemAdapter(mList, onItemClick = { drink ->
             val bundle = bundleOf(
-                "strDrink " to drink.strDrink,
-                "strDrink " to drink.strDrinkThumb,
-                "strDrink " to drink.strInstructions,
-                "strDrink " to drink.strAlcoholic
+                "strDrink" to drink.strDrink,
+                "strDrinkThumb" to drink.strDrinkThumb,
+                "strInstructions" to drink.strInstructions,
+                "strAlcoholic" to drink.strAlcoholic
             )
         }, selectFav = {id,isSelected->
             drinksViewModel.insertFav(id,isSelected)
@@ -59,6 +59,8 @@ class DrinksRecipes : Fragment() {
         val rvItem: RecyclerView = view.findViewById(R.id.rvItem)
         rvItem.layoutManager = LinearLayoutManager(context)
         rvItem.adapter = adapter
+
+
 
 
         val radioGroup: RadioGroup = view.findViewById(R.id.radioGroup)
@@ -72,9 +74,17 @@ class DrinksRecipes : Fragment() {
                     R.id.rbByAlphabet -> "alphabet"
                     else -> "name"
                 }
-                val it = ""
-                drinksViewModel.saveLastSearch(it, selectedSearchType)
-                drinksViewModel.performSearch(it, selectedSearchType)
+
+                query?.let {
+                    if (selectedSearchType == "alphabet" && it.length == 1) {
+                        drinksViewModel.performSearch(it, selectedSearchType)
+                    } else if (selectedSearchType == "name") {
+                        drinksViewModel.performSearch(it, selectedSearchType)
+                    } else {
+                        Toast.makeText(context, "Please enter only one character for alphabet search", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
                 return false
             }
 
@@ -100,7 +110,7 @@ class DrinksRecipes : Fragment() {
         drinksViewModel.drinks.observe(viewLifecycleOwner) { drinks ->
             mList.clear()
             mList.addAll(drinks)
-            adapter.setFilteredList(drinks) // or adapter.notifyDataSetChanged() if you want to refresh the entire list
+            adapter.setFilteredList(drinks) // This will now only display filtered results
         }
     }
 

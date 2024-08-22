@@ -4,39 +4,30 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mohsin.code.drinksrecipe.model.Drink
-import mohsin.code.drinksrecipe.model.SearchQuery
 import mohsin.code.drinksrecipe.repository.DrinkRepository
 
 class DrinksViewModel(private val drinkRepository: DrinkRepository) : ViewModel() {
 
-    // LiveData for observing favorite drinks
+    // LiveData for observing drinks
     val drinks: MutableLiveData<List<Drink>> = MutableLiveData()
-//        drinkRepository.getDrinksAll() as MutableLiveData<List<Drink>>
 
+
+
+    // LiveData for observing favorite drinks
     val favoriteDrinks: LiveData<List<Drink>> = drinkRepository.getFavoriteDrinks()
-    private val _lastSearchQuery = MutableLiveData<SearchQuery?>()
 
-
-    // Initialization block
     init {
-        loadLastSearchQuery()
+        drinkRepository.getDrinksAll()
+    }
+
+    fun insertFav(id: Int, isSelected: Boolean) = viewModelScope.launch {
+        drinkRepository.updateFavoriteStatus(id, isSelected)
     }
 
 
-    fun insertFav(id: Int, isSelected: Boolean) = viewModelScope.launch() {
-        drinkRepository.updateFavoriteStatus(id = id, isSelected)
-    }
-
-    private fun loadLastSearchQuery() {
-        viewModelScope.launch {
-            val searchQuery = drinkRepository.getLastSearch()
-            _lastSearchQuery.postValue(searchQuery)
-        }
-    }
-
+    // Perform search with filtering logic
     fun performSearch(query: String, searchType: String) {
         viewModelScope.launch {
             val results = when (searchType) {
@@ -44,14 +35,18 @@ class DrinksViewModel(private val drinkRepository: DrinkRepository) : ViewModel(
                 "alphabet" -> drinkRepository.searchByAlphabet(query)
                 else -> emptyList()
             }
-            drinks.postValue(results)
-        }
-    }
 
-    fun saveLastSearch(query: String, searchType: String) {
-        viewModelScope.launch {
-            drinkRepository.saveLastSearch(query, searchType)
-            _lastSearchQuery.postValue(SearchQuery(query = query, searchType = searchType))
+            // Filter results that match the query
+            val filteredResults = results.filter { drink ->
+                when (searchType) {
+                    "name" -> drink.strDrink.lowercase().contains(query.lowercase())
+                    "alphabet" -> drink.strDrink.lowercase().startsWith(query.lowercase())
+                    else -> false
+                }
+            }
+
+            // Post only the filtered data to LiveData
+            drinks.postValue(filteredResults)
         }
     }
 }

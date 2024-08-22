@@ -6,9 +6,9 @@ import retrofit2.http.Query
 
 interface ApiInterface {
 
-    @GET("search.php?s=margarita")
+    @GET("search.php")
     suspend fun getDrinksByName(@Query("s") name: String): Drinks
 
-    @GET("search.php?f=a")
+    @GET("search.php")
     suspend fun getDrinksByAlphabet(@Query("f") alphabet: String): Drinks
 }
