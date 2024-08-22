@@ -12,8 +12,9 @@ data class Drinks (
 @Entity(tableName = "drinks")
 data class Drink(
 
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0, // or use Long if you prefer
+    @PrimaryKey
+    @SerializedName("idDrink")
+    val idDrink: String,  // Use API's idDrink as the primary key
 
     @SerializedName("strDrink")
     val strDrink: String,

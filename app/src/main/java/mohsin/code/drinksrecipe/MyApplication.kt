@@ -23,7 +23,7 @@ class MyApplication: Application() {
         val database = DrinkDatabase.getDatabase(applicationContext)
 
 
-        drinkRepository = DrinkRepository(apiInterface, database)
+        drinkRepository = DrinkRepository(apiInterface, database, applicationContext)
 
     }
 }

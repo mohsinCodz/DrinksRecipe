@@ -18,7 +18,7 @@ import mohsin.code.drinksrecipe.repository.DrinkRepository
 
 class ItemAdapter(
     private var items: List<Drink>,
-   val selectFav:(Int,Boolean)->Unit,
+   val selectFav:(String,Boolean)->Unit,
     private val onItemClick: (Drink) -> Unit
 ): RecyclerView.Adapter<ItemAdapter.MyViewHolder>() {
 
@@ -51,7 +51,7 @@ class ItemAdapter(
         // Set a listener for when the favorite checkbox is checked/unchecked
         holder.cbFavorite.setOnCheckedChangeListener { _, isChecked ->
             drink.isFavorite = isChecked // Update the local data model
-            selectFav(drink.id, isChecked) // Update the database or whatever persistence mechanism you use
+            selectFav(drink.idDrink, isChecked) // Update the database or whatever persistence mechanism you use
         }
         // Load the drink thumbnail into the ImageView using Glide
         Glide.with(holder.itemView.context)

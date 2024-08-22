@@ -21,8 +21,8 @@ interface RoomDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDrink(drinks: List<Drink>)
 
-    @Query("SELECT * FROM drinks WHERE id = :id")
-    suspend fun getDrinkById(id: Int): Drink?
+    @Query("SELECT * FROM drinks WHERE idDrink = :idDrink")
+    suspend fun getDrinkById(idDrink: String): Drink?
 
     @Query("SELECT * FROM drinks")
     fun getDrinks(): LiveData<List<Drink>>
@@ -36,8 +36,8 @@ interface RoomDao {
     @Update
     suspend fun updateDrink(drink: Drink)
 
-    @Query("UPDATE drinks SET isFavorite = :isFavorite WHERE id = :id")
-    suspend fun updateFavoriteStatus(id: Int, isFavorite: Boolean)
+    @Query("UPDATE drinks SET isFavorite = :isFavorite WHERE idDrink = :idDrink")
+    suspend fun updateFavoriteStatus(idDrink: String, isFavorite: Boolean)
 
     @Query("SELECT * FROM drinks WHERE isFavorite = 1")
     fun getAllFavoriteDrinks(): LiveData<List<Drink>>

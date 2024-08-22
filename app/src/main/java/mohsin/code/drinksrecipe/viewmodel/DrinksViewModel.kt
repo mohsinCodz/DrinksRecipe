@@ -21,8 +21,8 @@ class DrinksViewModel(private val drinkRepository: DrinkRepository) : ViewModel(
     // LiveData for favorite drinks
     val favoriteDrinks: LiveData<List<Drink>> = drinkRepository.getFavoriteDrinks()
 
-    fun insertFav(id: Int, isSelected: Boolean) = viewModelScope.launch {
-        drinkRepository.updateFavoriteStatus(id, isSelected)
+    fun insertFav(idDrink: String, isSelected: Boolean) = viewModelScope.launch {
+        drinkRepository.updateFavoriteStatus(idDrink, isSelected)
     }
 
     // Perform search with error handling

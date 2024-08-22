@@ -47,8 +47,8 @@ class FavoriteRecipes : Fragment() {
                 "strDrink " to drink.strInstructions,
                 "strDrink " to drink.strAlcoholic
             )
-        }, selectFav = { id, isSelected ->
-            drinksViewModel.insertFav(id, isSelected)
+        }, selectFav = { idDrink, isSelected ->
+            drinksViewModel.insertFav(idDrink, isSelected)
         })
 
         val rvFavorites: RecyclerView = view.findViewById(R.id.rvFavorites)
