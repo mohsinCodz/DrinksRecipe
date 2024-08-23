@@ -25,11 +25,12 @@ class DrinksRecipes : Fragment() {
     private lateinit var adapter: ItemAdapter
     private lateinit var drinksViewModel: DrinksViewModel
 
+    private var isSearchActive = false // Flag to track search state
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_drinks_recipes, container, false)
     }
 
@@ -37,10 +38,14 @@ class DrinksRecipes : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as? AppCompatActivity)?.supportActionBar?.title = "Drinks Recipes"
 
-        // Initialize the DrinkRepository
+        // Initialize the repository and ViewModel
         val repository = (requireActivity().application as MyApplication).drinkRepository
+        drinksViewModel = ViewModelProvider(
+            this,
+            DrinksViewModelFactory(repository)
+        ).get(DrinksViewModel::class.java)
 
-        // Initialize the adapter
+        // Initialize adapter
         adapter = ItemAdapter(mList, onItemClick = { drink ->
             val bundle = bundleOf(
                 "strDrink" to drink.strDrink,
@@ -48,7 +53,8 @@ class DrinksRecipes : Fragment() {
                 "strInstructions" to drink.strInstructions,
                 "strAlcoholic" to drink.strAlcoholic
             )
-        }, selectFav = {idDrink, isSelected ->
+            // Navigate to detail screen
+        }, selectFav = { idDrink, isSelected ->
             drinksViewModel.insertFav(idDrink, isSelected)
         })
 
@@ -59,24 +65,13 @@ class DrinksRecipes : Fragment() {
         val radioGroup: RadioGroup = view.findViewById(R.id.radioGroup)
         val searchView: SearchView = view.findViewById(R.id.searchView)
 
+        // SearchView logic
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                val selectedSearchType = when (radioGroup.checkedRadioButtonId) {
-                    R.id.rbByName -> "name"
-                    R.id.rbByAlphabet -> "alphabet"
-                    else -> "name"
+                if (!isSearchActive) { // Only perform search if not already active
+                    isSearchActive = true
+                    query?.let { drinksViewModel.performSearch(it, getSearchType(radioGroup)) }
                 }
-
-                query?.let {
-                    if (selectedSearchType == "alphabet" && it.length == 1) {
-                        drinksViewModel.performSearch(it, selectedSearchType)
-                    } else if (selectedSearchType == "name") {
-                        drinksViewModel.performSearch(it, selectedSearchType)
-                    } else {
-                        Toast.makeText(context, "Please enter only one character for alphabet search", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
                 return false
             }
 
@@ -86,59 +81,49 @@ class DrinksRecipes : Fragment() {
             }
         })
 
-        // Initialize the ViewModel
-        drinksViewModel = ViewModelProvider(
-            this,
-            DrinksViewModelFactory(repository)
-        ).get(DrinksViewModel::class.java)
-
-        // Observe drinks data from the database
-        repository.getDrinksAll().observe(viewLifecycleOwner) { drinks ->
-            if (drinks.isNotEmpty()) {
+        // Observe and update UI with drinks data from ViewModel
+        drinksViewModel.drinks.observe(viewLifecycleOwner) { drinks ->
+            // Only update if search is not active (initial load or clearing search)
+            if (!isSearchActive) {
                 mList.clear()
                 mList.addAll(drinks)
-                adapter.setFilteredList(drinks)
-            } else {
-                Toast.makeText(context, "No drinks found in the database", Toast.LENGTH_SHORT).show()
+                adapter.notifyDataSetChanged() // Update adapter with full data
             }
         }
 
-        // Observe drinks data
-        drinksViewModel.drinks.observe(viewLifecycleOwner) { drinks ->
-            mList.clear()
-            mList.addAll(drinks)
-            adapter.setFilteredList(drinks)
+        // Handle database data and update ViewModel
+        repository.getDrinksAll().observe(viewLifecycleOwner) { drinks ->
+            drinksViewModel.drinks.postValue(drinks)
         }
-
-
-        drinksViewModel.fetchDataByName("Margarita") // Fetch and store in DB
-        // Or
-        drinksViewModel.fetchDataByAlphabet("A") // Fetch and store in DB
 
         // Observe error messages
         drinksViewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
         }
+    }
 
-        // Observe all drinks
-        repository.getDrinksAll().observe(viewLifecycleOwner) { drinks ->
-            drinksViewModel.drinks.postValue(drinks)
+    private fun getSearchType(radioGroup: RadioGroup): String {
+        return when (radioGroup.checkedRadioButtonId) {
+            R.id.rbByName -> "name"
+            R.id.rbByAlphabet -> "alphabet"
+            else -> "name"
         }
     }
 
+    // Filter list locally as the user types in SearchView
     private fun filterText(query: String?) {
         if (query != null) {
             val filteredList = ArrayList<Drink>()
-            for (i in mList) {
-                if (i.strDrink.lowercase(Locale.ROOT).contains(query.lowercase(Locale.ROOT))) {
-                    filteredList.add(i)
+            for (drink in mList) {
+                if (drink.strDrink.lowercase(Locale.ROOT).contains(query.lowercase(Locale.ROOT))) {
+                    filteredList.add(drink)
                 }
             }
 
             if (filteredList.isEmpty()) {
                 Toast.makeText(context, "No Data Found", Toast.LENGTH_SHORT).show()
             } else {
-                adapter.setFilteredList(filteredList)
+                adapter.setFilteredList(filteredList) // Update adapter with filtered data
             }
         }
     }

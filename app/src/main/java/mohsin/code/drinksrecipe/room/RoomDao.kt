@@ -18,6 +18,12 @@ interface RoomDao {
     @Query("SELECT * FROM search_queries WHERE id = 1 LIMIT 1")
     suspend fun getLastSearchQuery(): SearchQuery?
 
+    @Query("SELECT * FROM drinks WHERE strDrink LIKE '%' || :name || '%'")
+    suspend fun getDrinksByName(name: String): List<Drink>?
+
+    @Query("SELECT * FROM drinks WHERE strDrink LIKE :alphabet || '%'")
+    suspend fun getDrinksByAlphabet(alphabet: String): List<Drink>?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDrink(drinks: List<Drink>)
 

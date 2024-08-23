@@ -1,14 +1,11 @@
 package mohsin.code.drinksrecipe.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mohsin.code.drinksrecipe.model.Drink
-import mohsin.code.drinksrecipe.model.SearchQuery
 import mohsin.code.drinksrecipe.repository.DrinkRepository
 import retrofit2.HttpException
 import java.io.IOException
@@ -50,22 +47,6 @@ class DrinksViewModel(private val drinkRepository: DrinkRepository) : ViewModel(
             } catch (e: HttpException) {
                 errorMessage.postValue("Something went wrong! Please try again.")
             }
-        }
-    }
-
-    fun fetchDataByName(name: String) = viewModelScope.launch {
-        try {
-            drinkRepository.searchByName(name) // Fetch and store in DB
-        } catch (e: Exception) {
-            // Handle errors if any
-        }
-    }
-
-    fun fetchDataByAlphabet(alphabet: String) = viewModelScope.launch {
-        try {
-            drinkRepository.searchByAlphabet(alphabet) // Fetch and store in DB
-        } catch (e: Exception) {
-            // Handle errors if any
         }
     }
 }

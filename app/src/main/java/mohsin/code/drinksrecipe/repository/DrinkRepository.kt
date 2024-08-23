@@ -18,56 +18,63 @@ class DrinkRepository(
     private val context: Context
 ) {
 
+    // Check if the database is empty
     private suspend fun isDatabaseEmpty(): Boolean {
         return drinkDatabase.drinkDao().getDrinkCount() == 0
     }
 
+    // Search drinks by name
     suspend fun searchByName(name: String): List<Drink> {
         return if (MyUtil.isInternetAvailable(context)) {
-            if (isDatabaseEmpty()) {
-                // Fetch data from API and update the database if it's empty
-                val drinks = apiInterface.getDrinksByName(name).drinks
-                drinkDatabase.drinkDao().insertDrink(drinks) // Insert into RoomDB
-                drinks
-            } else {
-                // Fetch from RoomDB if the database is not empty
-                drinkDatabase.drinkDao().getDrinks().value?.filter { it.strDrink.contains(name, ignoreCase = true) } ?: emptyList()
+            try {
+                // Fetch data from API when online
+                val response = apiInterface.getDrinksByName(name)
+                response.drinks?.let { drinks ->
+                    drinkDatabase.drinkDao().insertDrink(drinks) // Insert into RoomDB
+                    return drinks // Return fetched data from API
+                } ?: emptyList()
+            } catch (e: Exception) {
+                // If API fails, fetch from RoomDB
+                drinkDatabase.drinkDao().getDrinksByName(name) ?: emptyList()
             }
         } else {
-            // Fetch from RoomDB if offline
-            drinkDatabase.drinkDao().getDrinks().value?.filter { it.strDrink.contains(name, ignoreCase = true) } ?: emptyList()
+            // If offline, fetch data from RoomDB
+            drinkDatabase.drinkDao().getDrinksByName(name) ?: emptyList()
         }
     }
 
+    // Search drinks by starting alphabet
     suspend fun searchByAlphabet(alphabet: String): List<Drink> {
         return if (MyUtil.isInternetAvailable(context)) {
-            if (isDatabaseEmpty()) {
-                // Fetch data from API and update the database if it's empty
-                val drinks = apiInterface.getDrinksByAlphabet(alphabet).drinks
-                drinkDatabase.drinkDao().insertDrink(drinks) // Insert into RoomDB
-                drinks
-            } else {
-                // Fetch from RoomDB if the database is not empty
-                drinkDatabase.drinkDao().getDrinks().value?.filter { it.strDrink.startsWith(alphabet, ignoreCase = true) } ?: emptyList()
+            try {
+                // Fetch data from API when online
+                val response = apiInterface.getDrinksByAlphabet(alphabet)
+                response.drinks?.let { drinks ->
+                    drinkDatabase.drinkDao().insertDrink(drinks) // Insert into RoomDB
+                    return drinks // Return fetched data from API
+                } ?: emptyList()
+            } catch (e: Exception) {
+                // If API fails, fetch from RoomDB
+                drinkDatabase.drinkDao().getDrinksByAlphabet(alphabet) ?: emptyList()
             }
         } else {
-            // Fetch from RoomDB if offline
-            drinkDatabase.drinkDao().getDrinks().value?.filter { it.strDrink.startsWith(alphabet, ignoreCase = true) } ?: emptyList()
+            // If offline, fetch data from RoomDB
+            drinkDatabase.drinkDao().getDrinksByAlphabet(alphabet) ?: emptyList()
         }
     }
 
+    // Get all drinks from RoomDB
     fun getDrinksAll(): LiveData<List<Drink>> {
-        return drinkDatabase.drinkDao().getDrinks() // Get data from RoomDB
+        return drinkDatabase.drinkDao().getDrinks()
     }
 
-    // Expose favorite drinks as LiveData
+    // Get all favorite drinks
     fun getFavoriteDrinks(): LiveData<List<Drink>> {
         return drinkDatabase.drinkDao().getAllFavoriteDrinks()
     }
 
-    // Method to update the favorite status of a drink
+    // Update the favorite status of a drink
     suspend fun updateFavoriteStatus(idDrink: String, isFavorite: Boolean) {
         drinkDatabase.drinkDao().updateFavoriteStatus(idDrink, isFavorite)
     }
-
 }
